@@ -1,4 +1,5 @@
 import os
+import env_loader
 from binance import AsyncClient
 
 async def get_binance_client():
