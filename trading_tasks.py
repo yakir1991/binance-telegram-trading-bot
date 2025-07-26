@@ -47,7 +47,14 @@ async def grid_loop():
         levels = CONFIG["grid"]["levels"]
         amount = CONFIG["dca_amount"]
         # call the grid strategy implementation
-        await grid.execute(client=None, symbol=symbol, lower=lower, upper=upper, levels=levels, amount=amount)
+        await grid.execute(
+            client=None,
+            symbol=symbol,
+            lower_price=lower,
+            upper_price=upper,
+            grids=levels,
+            quantity=amount,
+        )
         await asyncio.sleep(CONFIG["grid_interval_minutes"] * 60)
 
 async def scalping_loop():
@@ -57,8 +64,14 @@ async def scalping_loop():
     while True:
         symbol = CONFIG["symbols"][0]
         quantity = CONFIG["dca_amount"]
+        indicators = {"rsi_period": 14, "ema_fast": 7, "ema_slow": 25}
         # call the scalping strategy implementation
-        await scalping.execute(client=None, symbol=symbol, quantity=quantity, rsi_period=14, ema_fast=7, ema_slow=25)
+        await scalping.execute(
+            client=None,
+            symbol=symbol,
+            quantity=quantity,
+            indicators=indicators,
+        )
         await asyncio.sleep(CONFIG["scalping_interval_seconds"])
 
 async def trend_loop():
@@ -67,9 +80,15 @@ async def trend_loop():
     """
     while True:
         symbol = CONFIG["symbols"][0]
-             
+        quantity = CONFIG["dca_amount"]
+
         # call the trend following strategy implementation
-        await trend_following.execute(client=None, symbol=symbol, quantity=quantity, lookback=100)
+        await trend_following.execute(
+            client=None,
+            symbol=symbol,
+            quantity=quantity,
+            lookback=100,
+        )
         await asyncio.sleep(CONFIG["trend_interval_minutes"] * 60)
 
 async def sentiment_loop():
