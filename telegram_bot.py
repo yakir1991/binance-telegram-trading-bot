@@ -42,7 +42,9 @@ async def help_command(update, context):
         "/weights – show current strategy weights\n"
         "/setweights – set new strategy weights\n"
         "Usage: /setweights <dca> <grid> <scalping> <trend> <sentiment>\n"
-        "The weights must add up to 1"
+        "The weights must add up to 1\n"
+        "/risk – show current risk level\n"
+        "/setrisk – set a new risk level (0.0-1.0)"
     )
 
 
@@ -82,6 +84,27 @@ async def setweights_command(update, context):
     await update.message.reply_text("Weights updated")
 
 
+async def risk_command(update, context):
+    risk = CONFIG.get("risk_level", 1.0)
+    await update.message.reply_text(f"Current risk level: {risk:.2f}")
+
+
+async def setrisk_command(update, context):
+    if len(context.args) != 1:
+        await update.message.reply_text("Usage: /setrisk <level> (0.0-1.0)")
+        return
+    try:
+        level = float(context.args[0])
+    except ValueError:
+        await update.message.reply_text("Risk level must be a number")
+        return
+    if level < 0 or level > 1:
+        await update.message.reply_text("Risk level must be between 0.0 and 1.0")
+        return
+    CONFIG["risk_level"] = level
+    await update.message.reply_text(f"Risk level set to {level:.2f}")
+
+
 def main() -> None:
     """Start the Telegram bot and trading tasks."""
     telegram_token = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -96,6 +119,8 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("weights", weights_command))
     application.add_handler(CommandHandler("setweights", setweights_command))
+    application.add_handler(CommandHandler("risk", risk_command))
+    application.add_handler(CommandHandler("setrisk", setrisk_command))
 
     loop = asyncio.get_event_loop()
     loop.create_task(dca_loop())
