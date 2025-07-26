@@ -32,11 +32,11 @@ class DummyClient:
         from datetime import datetime, timedelta
         import random
 
-        # very rough parsing of lookback like "30 days ago UTC"
+        # very rough parsing of lookback like "365 days ago UTC"
         try:
             days = int(str(lookback).split()[0])
         except Exception:
-            days = 30
+            days = 365
 
         # assume hourly interval regardless of the value passed
         points = days * 24
