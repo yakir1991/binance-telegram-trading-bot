@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 from datetime import datetime
 
 # Example strategies (to be implemented in strategies package)
@@ -85,7 +86,9 @@ def main() -> None:
     """
     Entry point for the trading bot. Starts Telegram bot and trading tasks.
     """
-    telegram_token = "YOUR_TELEGRAM_BOT_TOKEN"  # TODO: Replace with your bot token or load from environment
+    telegram_token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not telegram_token:
+        raise RuntimeError("TELEGRAM_BOT_TOKEN environment variable is not set.")
 
     application = ApplicationBuilder().token(telegram_token).build()
     application.add_handler(CommandHandler("start", start))
