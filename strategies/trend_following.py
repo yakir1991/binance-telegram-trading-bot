@@ -10,7 +10,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 async def execute(
-    client, symbol: str, quantity: float, indicators: dict, weight: float
+    client,
+    symbol: str,
+    quantity: float,
+    indicators: dict,
+    weight: float,
+    bot=None,
+    chat_id=None,
 ):
     """
     Execute Trend Following strategy.
@@ -25,13 +31,13 @@ async def execute(
     Uses trend signals to decide long or short positions.
     """
     try:
-        logger.info(
-            "Executing Trend strategy for %s with quantity %f and indicators: %s (weight %.2f)",
-            symbol,
-            quantity,
-            indicators,
-            weight,
+        message = (
+            "Executing Trend strategy for %s with quantity %f and indicators: %s (weight %.2f)"
+            % (symbol, quantity, indicators, weight)
         )
+        logger.info(message)
+        if bot and chat_id:
+            await bot.send_message(chat_id=chat_id, text=message)
         # Example logic:
         # if indicators.get("trend_signal") > 0:
         #     # Positive trend: go long
