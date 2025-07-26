@@ -24,10 +24,11 @@ async def execute(
         client: Binance client for order execution.
         symbol (str): Trading pair.
         quantity (float): Quantity to trade per signal.
-        indicators (dict): Precomputed technical indicators (e.g., moving averages, RSI).
+        indicators (dict): Parameters controlling the moving average periods.
         weight (float): Weight of this strategy when executed.
 
-    This placeholder uses technical indicators to decide whether to enter or exit a trade quickly.
+    The strategy calculates simple moving averages on hourly closes and places
+    market orders when the fast average crosses the slow one.
     """
     try:
         message = (
@@ -37,14 +38,37 @@ async def execute(
         logger.info(message)
         if bot and chat_id:
             await bot.send_message(chat_id=chat_id, text=message)
-        # Example logic:
-        # if indicators.get("short_ma") > indicators.get("long_ma"):
-        #     # Bullish signal: place market buy order
-        #     order = await client.order_market_buy(symbol=symbol, quantity=quantity)
-        #     logger.info("Scalping buy order: %s", order)
-        # elif indicators.get("short_ma") < indicators.get("long_ma"):
-        #     # Bearish signal: place market sell order
-        #     order = await client.order_market_sell(symbol=symbol, quantity=quantity)
-        #     logger.info("Scalping sell order: %s", order)
+
+        short_period = int(indicators.get("ema_fast", 7))
+        long_period = int(indicators.get("ema_slow", 25))
+        lookback = int(indicators.get("lookback", long_period + 5))
+
+        klines = await client.get_historical_klines(
+            symbol, interval="1h", lookback=f"{lookback} hours ago UTC"
+        )
+        closes = [float(k[4]) for k in klines]
+        if len(closes) < long_period:
+            logger.warning("Not enough data for scalping")
+            return
+
+        short_ma = sum(closes[-short_period:]) / short_period
+        long_ma = sum(closes[-long_period:]) / long_period
+
+        if short_ma > long_ma:
+            trade_msg = (
+                f"Scalping signal BUY {quantity} {symbol}: short_ma {short_ma:.4f} > long_ma {long_ma:.4f}"
+            )
+            if bot and chat_id:
+                await bot.send_message(chat_id=chat_id, text=trade_msg)
+            order = await client.order_market_buy(symbol=symbol, quantity=quantity)
+            logger.info("Scalping buy order: %s", order)
+        elif short_ma < long_ma:
+            trade_msg = (
+                f"Scalping signal SELL {quantity} {symbol}: short_ma {short_ma:.4f} < long_ma {long_ma:.4f}"
+            )
+            if bot and chat_id:
+                await bot.send_message(chat_id=chat_id, text=trade_msg)
+            order = await client.order_market_sell(symbol=symbol, quantity=quantity)
+            logger.info("Scalping sell order: %s", order)
     except Exception as e:
         logger.exception("Error executing Scalping strategy: %s", e)

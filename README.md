@@ -25,6 +25,14 @@ For example:
 /setweights 0.2 0.2 0.2 0.2 0.2
 ```
 
+## Scalping Strategy
+
+The `scalping` module implements a simple moving average crossover.
+It calculates fast and slow averages from hourly closing prices. When the
+fast average rises above the slow one, the bot places a market buy order.
+If it falls below, a market sell order is executed. This allows trading even
+with the sentiment strategy disabled.
+
 ## Risk Level
 
 You can adjust how aggressively the bot trades by setting a risk level between `0.0` and `1.0`.

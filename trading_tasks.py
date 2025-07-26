@@ -36,7 +36,7 @@ CONFIG = {
         "grid": 0.2,
         "scalping": 0.2,
         "trend": 0.2,
-        "sentiment": 0.2,
+        "sentiment": 0.0,
     },
     "risk_level": 1.0,
 }
