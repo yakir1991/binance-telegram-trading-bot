@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import logger_config
+from data_training import calculate_recommended_weights
 
 from strategies import dca, grid, scalping, trend_following, sentiment
 
@@ -151,6 +152,19 @@ async def sentiment_loop():
         await asyncio.sleep(CONFIG["sentiment_interval_minutes"] * 60)
 
 
+async def weight_training_loop():
+    """Periodically recalculate strategy weights from historical data."""
+    while True:
+        symbol = CONFIG["symbols"][0]
+        try:
+            weights = await calculate_recommended_weights(symbol)
+            CONFIG["weights"].update(weights)
+            logger.info("Automatically updated weights: %s", weights)
+        except Exception as e:
+            logger.exception("Failed to update weights: %s", e)
+        await asyncio.sleep(24 * 60 * 60)
+
+
 async def main():
     """
     Entry point for running all strategy loops concurrently.
@@ -161,6 +175,7 @@ async def main():
         asyncio.create_task(scalping_loop()),
         asyncio.create_task(trend_loop()),
         asyncio.create_task(sentiment_loop()),
+        asyncio.create_task(weight_training_loop()),
     ]
     await asyncio.gather(*tasks)
 

@@ -10,11 +10,13 @@ from trading_tasks import (
     scalping_loop,
     trend_loop,
     sentiment_loop,
+    weight_training_loop,
     CONFIG,
 )
 import trading_tasks
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import binance_client
+import data_training
 
 # Configure module logger
 logger = logging.getLogger(__name__)
@@ -34,6 +36,7 @@ def start_tasks() -> None:
     loop.create_task(scalping_loop())
     loop.create_task(trend_loop())
     loop.create_task(sentiment_loop())
+    loop.create_task(weight_training_loop())
     tasks_started = True
     logger.info("Trading tasks started")
 
@@ -63,9 +66,9 @@ async def help_command(update, context):
         "/status – check the current status of the strategies\n"
         "/help – display this command list\n"
         "/weights – show current strategy weights\n"
-        "/setweights – set new strategy weights\n"
-        "Usage: /setweights <dca> <grid> <scalping> <trend> <sentiment>\n"
-        "The weights must add up to 1\n"
+        "/setweights – set new strategy weights or \"auto\" to retrain\n"
+        "Usage: /setweights <dca> <grid> <scalping> <trend> <sentiment> | auto\n"
+        "The weights must add up to 1 when numbers are provided\n"
         "/risk – show current risk level\n"
         "/setrisk – set a new risk level (0.0-1.0)\n"
         "/portfolio – show detailed account portfolio"
@@ -81,9 +84,19 @@ async def weights_command(update, context):
 
 
 async def setweights_command(update, context):
+    if len(context.args) == 1 and context.args[0].lower() == "auto":
+        await update.message.reply_text("Training weights, please wait...")
+        try:
+            symbol = CONFIG["symbols"][0]
+            weights = await data_training.calculate_recommended_weights(symbol)
+            CONFIG["weights"].update(weights)
+            await update.message.reply_text("Weights updated automatically")
+        except Exception as e:
+            await update.message.reply_text(f"Failed to update weights: {e}")
+        return
     if len(context.args) != 5:
         await update.message.reply_text(
-            "Usage: /setweights <dca> <grid> <scalping> <trend> <sentiment>"
+            "Usage: /setweights <dca> <grid> <scalping> <trend> <sentiment> | auto"
         )
         return
     try:

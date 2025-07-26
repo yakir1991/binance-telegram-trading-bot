@@ -15,7 +15,9 @@ The bot loads this file automatically on startup so your environment variables a
 
 You can control how much capital each strategy uses by setting weights from Telegram. The weights of all strategies must sum to `1`.
 
-Use `/weights` to view the current weights and `/setweights <dca> <grid> <scalping> <trend> <sentiment>` to update them. For example:
+Use `/weights` to view the current weights and `/setweights <dca> <grid> <scalping> <trend> <sentiment>` to update them.
+You can also run `/setweights auto` to calculate weights from recent market data.
+For example:
 
 ```
 /setweights 0.2 0.2 0.2 0.2 0.2
