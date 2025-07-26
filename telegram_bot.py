@@ -19,6 +19,24 @@ import binance_client
 # Configure module logger
 logger = logging.getLogger(__name__)
 
+# Flag to ensure background tasks are started only once
+tasks_started = False
+
+
+def start_tasks() -> None:
+    """Schedule all trading loops if not already running."""
+    global tasks_started
+    if tasks_started:
+        return
+    loop = asyncio.get_event_loop()
+    loop.create_task(dca_loop())
+    loop.create_task(grid_loop())
+    loop.create_task(scalping_loop())
+    loop.create_task(trend_loop())
+    loop.create_task(sentiment_loop())
+    tasks_started = True
+    logger.info("Trading tasks started")
+
 
 async def start_command(update, context):
     trading_tasks.TELEGRAM_CHAT_ID = update.effective_chat.id
@@ -28,6 +46,8 @@ async def start_command(update, context):
         "I run various trading strategies and update you on Telegram.\n"
         "Use the /help command to see all available commands."
     )
+    if not tasks_started:
+        start_tasks()
 
 
 async def status_command(update, context):
@@ -190,13 +210,6 @@ def main() -> None:
     application.add_handler(CommandHandler("risk", risk_command))
     application.add_handler(CommandHandler("setrisk", setrisk_command))
     application.add_handler(CommandHandler("portfolio", portfolio_command))
-
-    loop = asyncio.get_event_loop()
-    loop.create_task(dca_loop())
-    loop.create_task(grid_loop())
-    loop.create_task(scalping_loop())
-    loop.create_task(trend_loop())
-    loop.create_task(sentiment_loop())
 
     logger.info("Starting Telegram bot polling")
     application.run_polling()
