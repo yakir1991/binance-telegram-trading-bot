@@ -15,21 +15,22 @@ logger = logging.getLogger(__name__)
 async def start_command(update, context):
     await update.message.reply_text(
         "Hello! I'm your Binance trading bot.\n"
-        "I run various trading strategies and report status on Telegram.\n"
+        "I run various trading strategies and update you on Telegram.\n"
         "Use the /help command to see all available commands."
     )
 
 async def status_command(update, context):
     await update.message.reply_text(
-        "The strategies are running in the background. Check the logs for more information."
+        "The strategies are running in the background. Check the logs for more details."
     )
 
 async def help_command(update, context):
     await update.message.reply_text(
         "Available commands:\n"
-        "/start - initiate conversation with the bot\n"
-        "/status - check the current strategy status\n"
-        "/help - show this command list"
+        "/start – start chatting with the bot\n"
+        "/status – check the current status of the strategies\n"
+        "/help – display this command list"
+
     )
 
 async def telegram_bot():

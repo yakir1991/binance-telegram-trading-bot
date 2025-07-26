@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import env_loader
 from datetime import datetime
 
 # Example strategies (to be implemented in strategies package)
