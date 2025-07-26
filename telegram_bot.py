@@ -40,7 +40,9 @@ async def help_command(update, context):
         "/status – check the current status of the strategies\n"
         "/help – display this command list\n"
         "/weights – show current strategy weights\n"
-        "/setweights – set new strategy weights"
+        "/setweights – set new strategy weights\n"
+        "Usage: /setweights <dca> <grid> <scalping> <trend> <sentiment>\n"
+        "The weights must add up to 1"
     )
 
 
