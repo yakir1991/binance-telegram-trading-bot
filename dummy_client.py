@@ -27,6 +27,49 @@ class DummyClient:
         price = self.prices.get(symbol, 0.0)
         return {"price": str(price)}
 
+    async def get_historical_klines(self, symbol, interval, lookback):
+        """Return synthetic kline data for the requested period."""
+        from datetime import datetime, timedelta
+        import random
+
+        # very rough parsing of lookback like "30 days ago UTC"
+        try:
+            days = int(str(lookback).split()[0])
+        except Exception:
+            days = 30
+
+        # assume hourly interval regardless of the value passed
+        points = days * 24
+        now = datetime.utcnow() - timedelta(hours=points)
+
+        klines = []
+        base_price = self.prices.get(symbol, 100.0)
+        for i in range(points):
+            open_time = int((now + timedelta(hours=i)).timestamp() * 1000)
+            close_time = int((now + timedelta(hours=i + 1)).timestamp() * 1000)
+            open_p = base_price * (1 + random.uniform(-0.01, 0.01))
+            close_p = base_price * (1 + random.uniform(-0.01, 0.01))
+            high_p = max(open_p, close_p) * (1 + random.uniform(0, 0.01))
+            low_p = min(open_p, close_p) * (1 - random.uniform(0, 0.01))
+            volume = random.uniform(1, 10)
+            klines.append(
+                [
+                    open_time,
+                    str(open_p),
+                    str(high_p),
+                    str(low_p),
+                    str(close_p),
+                    str(volume),
+                    close_time,
+                    "0",
+                    0,
+                    "0",
+                    "0",
+                    "0",
+                ]
+            )
+        return klines
+
     async def order_market_buy(self, symbol, quantity):
         price = self.prices.get(symbol, 0.0)
         cost = price * quantity
