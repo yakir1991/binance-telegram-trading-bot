@@ -10,7 +10,9 @@ from datetime import datetime, timedelta
 # Configure a logger for this module
 logger = logging.getLogger(__name__)
 
-async def execute(client, symbol: str, amount: float, interval_minutes: int):
+async def execute(
+    client, symbol: str, amount: float, interval_minutes: int, weight: float
+):
     """
     Execute DCA strategy.
 
@@ -19,11 +21,16 @@ async def execute(client, symbol: str, amount: float, interval_minutes: int):
         symbol (str): Trading pair, e.g., 'BTCUSDT'.
         amount (float): Amount to invest each time.
         interval_minutes (int): Interval in minutes between purchases.
+        weight (float): Weight of this strategy when executed.
     """
     try:
         # This placeholder logs the intention to buy; implement actual order placement here
         logger.info(
-            "Executing DCA: buying %s units of %s every %s minutes.", amount, symbol, interval_minutes
+            "Executing DCA: buying %s units of %s every %s minutes (weight %.2f).",
+            amount,
+            symbol,
+            interval_minutes,
+            weight,
         )
         # Example call to place a market order (to be implemented):
         # order = await client.order_market_buy(symbol=symbol, quantity=amount)

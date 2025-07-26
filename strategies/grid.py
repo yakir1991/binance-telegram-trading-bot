@@ -15,6 +15,7 @@ async def execute(
     upper_price: float,
     grids: int,
     quantity: float,
+    weight: float,
 ):
     """
     Execute Grid trading strategy.
@@ -26,18 +27,20 @@ async def execute(
         upper_price (float): Upper boundary.
         grids (int): Number of grid levels.
         quantity (float): Quantity to buy or sell at each grid.
+        weight (float): Weight of this strategy when executed.
 
     The strategy should divide the range into intervals and place limit buy orders below
     and limit sell orders above the current price accordingly.
     """
     try:
         logger.info(
-            "Executing Grid strategy for %s: range %.8f-%.8f with %d grids, quantity %f",
+            "Executing Grid strategy for %s: range %.8f-%.8f with %d grids, quantity %f (weight %.2f)",
             symbol,
             lower_price,
             upper_price,
             grids,
             quantity,
+            weight,
         )
         # Implementation placeholder:
         # Compute price levels and place limit orders.
