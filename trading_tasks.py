@@ -114,12 +114,15 @@ async def trend_loop():
         quantity = CONFIG["dca_amount"] * weight * CONFIG.get("risk_level", 1.0)
 
         # call the trend following strategy implementation
+        indicators = {"lookback": 100}
         await trend_following.execute(
             client=None,
             symbol=symbol,
             quantity=quantity,
-            lookback=100,
+            indicators=indicators,
             weight=weight,
+            bot=TELEGRAM_BOT,
+            chat_id=TELEGRAM_CHAT_ID,
         )
         await asyncio.sleep(CONFIG["trend_interval_minutes"] * 60)
 
