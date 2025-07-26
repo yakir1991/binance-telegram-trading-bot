@@ -4,7 +4,10 @@ Trading bot for Binance integrated with Telegram, focusing on informative and in
 ## Setup
 
 1. Copy `.env.example` to `.env`.
-2. Edit `.env` and provide your Binance API keys and Telegram bot token.
+2. Edit `.env` and provide your Telegram bot token. If you want to trade on
+   Binance, fill in your API keys. To run the bot without real API access,
+   set `DUMMY_ACCOUNT=true` and the bot will simulate a balance starting at
+   1000 USDT.
 
 The bot loads this file automatically on startup so your environment variables are available.
 
