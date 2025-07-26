@@ -9,7 +9,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 async def execute(
-    client, symbol: str, quantity: float, indicators: dict, weight: float
+    client,
+    symbol: str,
+    quantity: float,
+    indicators: dict,
+    weight: float,
+    bot=None,
+    chat_id=None,
 ):
     """
     Execute Scalping strategy.
@@ -24,13 +30,13 @@ async def execute(
     This placeholder uses technical indicators to decide whether to enter or exit a trade quickly.
     """
     try:
-        logger.info(
-            "Executing Scalping strategy for %s with quantity %f and indicators: %s (weight %.2f)",
-            symbol,
-            quantity,
-            indicators,
-            weight,
+        message = (
+            "Executing Scalping strategy for %s with quantity %f and indicators: %s (weight %.2f)"
+            % (symbol, quantity, indicators, weight)
         )
+        logger.info(message)
+        if bot and chat_id:
+            await bot.send_message(chat_id=chat_id, text=message)
         # Example logic:
         # if indicators.get("short_ma") > indicators.get("long_ma"):
         #     # Bullish signal: place market buy order

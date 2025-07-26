@@ -1,11 +1,16 @@
 import asyncio
 import logging
+import os
 import logger_config
 
 from strategies import dca, grid, scalping, trend_following, sentiment
 
 # Configure module logger
 logger = logging.getLogger(__name__)
+
+# Telegram integration
+TELEGRAM_BOT = None
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # Bot configuration
 CONFIG = {
@@ -93,6 +98,8 @@ async def scalping_loop():
             quantity=quantity,
             indicators=indicators,
             weight=weight,
+            bot=TELEGRAM_BOT,
+            chat_id=TELEGRAM_CHAT_ID,
         )
         await asyncio.sleep(CONFIG["scalping_interval_seconds"])
 
@@ -135,6 +142,8 @@ async def sentiment_loop():
             sentiment_score=sentiment_score,
             quantity=quantity,
             weight=weight,
+            bot=TELEGRAM_BOT,
+            chat_id=TELEGRAM_CHAT_ID,
         )
         await asyncio.sleep(CONFIG["sentiment_interval_minutes"] * 60)
 
