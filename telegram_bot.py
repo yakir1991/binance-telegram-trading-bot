@@ -85,12 +85,19 @@ async def weights_command(update, context):
 
 async def setweights_command(update, context):
     if len(context.args) == 1 and context.args[0].lower() == "auto":
-        await update.message.reply_text("Training weights, please wait...")
+        await update.message.reply_text("Starting weight training...")
         try:
             symbol = CONFIG["symbols"][0]
-            weights = await data_training.calculate_recommended_weights(symbol)
+            weights = await data_training.calculate_recommended_weights_with_progress(
+                symbol,
+                bot=context.bot,
+                chat_id=update.effective_chat.id,
+            )
             CONFIG["weights"].update(weights)
-            await update.message.reply_text("Weights updated automatically")
+            msg = "Updated weights:\n" + "\n".join(
+                f"{k}: {v:.2f}" for k, v in weights.items()
+            )
+            await update.message.reply_text(msg)
         except Exception as e:
             await update.message.reply_text(f"Failed to update weights: {e}")
         return

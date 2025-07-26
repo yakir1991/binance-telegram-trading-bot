@@ -61,3 +61,43 @@ async def calculate_recommended_weights(
     weights = {k: v / total for k, v in metrics.items()}
     logger.info("Recommended weights calculated: %s", weights)
     return weights
+
+
+async def calculate_recommended_weights_with_progress(
+    symbol: str,
+    interval: str = AsyncClient.KLINE_INTERVAL_1HOUR,
+    lookback: str = "30 days ago UTC",
+    bot=None,
+    chat_id=None,
+) -> dict:
+    """Calculate recommended weights and optionally send progress updates."""
+
+    if bot and chat_id:
+        await bot.send_message(chat_id=chat_id, text="Fetching historical data...")
+
+    df = await fetch_historical_data(symbol, interval, lookback)
+
+    if bot and chat_id:
+        await bot.send_message(chat_id=chat_id, text="Calculating weight metrics...")
+
+    returns = df["close"].pct_change().dropna()
+    momentum = returns.mean()
+    volatility = returns.std()
+
+    metrics = {
+        "dca": max(momentum, 0.0) + 1e-9,
+        "grid": volatility + 1e-9,
+        "scalping": volatility / 2 + 1e-9,
+        "trend": abs(momentum) + 1e-9,
+        "sentiment": 1e-9,
+    }
+
+    total = sum(metrics.values())
+    weights = {k: v / total for k, v in metrics.items()}
+
+    logger.info("Recommended weights calculated: %s", weights)
+
+    if bot and chat_id:
+        await bot.send_message(chat_id=chat_id, text="Training complete.")
+
+    return weights
