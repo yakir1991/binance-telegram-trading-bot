@@ -14,6 +14,7 @@ async def execute(
     quantity: float,
     sentiment_score: float,
     threshold: float = 0.0,
+    weight: float = 0.0,
     bot=None,
     chat_id=None,
 ):
@@ -29,16 +30,18 @@ async def execute(
         threshold (float): Minimum absolute sentiment value required to trigger a trade.
         bot: Telegram bot instance used to send notifications.
         chat_id: Telegram chat identifier for sending messages.
+        weight (float): Weight of this strategy when executed.
 
     If sentiment_score > threshold, a market buy order is placed; if
     sentiment_score < -threshold, a market sell order is placed.
     """
     try:
         logger.info(
-            "Executing Sentiment strategy for %s with sentiment %.4f and quantity %f",
+            "Executing Sentiment strategy for %s with sentiment %.4f and quantity %f (weight %.2f)",
             symbol,
             sentiment_score,
             quantity,
+            weight,
         )
         if sentiment_score > threshold:
             if bot and chat_id:
@@ -46,7 +49,7 @@ async def execute(
                     chat_id=chat_id,
                     text=(
                         f"Sentiment {sentiment_score:.4f} > {threshold:.4f}. "
-                        f"Buying {quantity} of {symbol}."
+                        f"Buying {quantity} of {symbol} (weight {weight:.2f})."
                     ),
                 )
             order = await client.order_market_buy(symbol=symbol, quantity=quantity)
@@ -57,7 +60,7 @@ async def execute(
                     chat_id=chat_id,
                     text=(
                         f"Sentiment {sentiment_score:.4f} < -{threshold:.4f}. "
-                        f"Selling {quantity} of {symbol}."
+                        f"Selling {quantity} of {symbol} (weight {weight:.2f})."
                     ),
                 )
             order = await client.order_market_sell(symbol=symbol, quantity=quantity)

@@ -8,7 +8,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-async def execute(client, symbol: str, quantity: float, indicators: dict):
+async def execute(
+    client, symbol: str, quantity: float, indicators: dict, weight: float
+):
     """
     Execute Scalping strategy.
 
@@ -17,15 +19,17 @@ async def execute(client, symbol: str, quantity: float, indicators: dict):
         symbol (str): Trading pair.
         quantity (float): Quantity to trade per signal.
         indicators (dict): Precomputed technical indicators (e.g., moving averages, RSI).
+        weight (float): Weight of this strategy when executed.
 
     This placeholder uses technical indicators to decide whether to enter or exit a trade quickly.
     """
     try:
         logger.info(
-            "Executing Scalping strategy for %s with quantity %f and indicators: %s",
+            "Executing Scalping strategy for %s with quantity %f and indicators: %s (weight %.2f)",
             symbol,
             quantity,
             indicators,
+            weight,
         )
         # Example logic:
         # if indicators.get("short_ma") > indicators.get("long_ma"):
