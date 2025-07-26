@@ -39,3 +39,9 @@ Install the required packages from `requirements.txt` and then start the bot:
 ```
 python telegram_bot.py
 ```
+
+## Portfolio Command
+
+Use `/portfolio` in Telegram to view a detailed summary of your Binance account.
+The bot reports the balance of each asset, the average purchase price based on
+your trade history, the current market price and the resulting profit or loss.
