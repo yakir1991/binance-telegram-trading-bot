@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import env_loader
+import logger_config
 from datetime import datetime
 
 # Example strategies (to be implemented in strategies package)
@@ -11,11 +12,7 @@ from strategies import dca, grid, scalping, trend_following, sentiment
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-)
+# Configure module logger
 logger = logging.getLogger(__name__)
 
 # Bot configuration
