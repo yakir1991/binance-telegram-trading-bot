@@ -25,11 +25,12 @@ logger = logging.getLogger(__name__)
 tasks_started = False
 
 
-def start_tasks() -> None:
+async def start_tasks() -> None:
     """Schedule all trading loops if not already running."""
     global tasks_started
     if tasks_started:
         return
+    trading_tasks.BINANCE_CLIENT = await binance_client.get_binance_client()
     loop = asyncio.get_event_loop()
     loop.create_task(dca_loop())
     loop.create_task(grid_loop())
@@ -50,7 +51,7 @@ async def start_command(update, context):
         "Use the /help command to see all available commands."
     )
     if not tasks_started:
-        start_tasks()
+        await start_tasks()
 
 
 async def status_command(update, context):
