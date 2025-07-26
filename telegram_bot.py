@@ -82,7 +82,8 @@ async def setweights_command(update, context):
     await update.message.reply_text("Weights updated")
 
 
-async def telegram_bot():
+def main() -> None:
+    """Start the Telegram bot and trading tasks."""
     telegram_token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not telegram_token:
         raise RuntimeError(
@@ -96,30 +97,19 @@ async def telegram_bot():
     application.add_handler(CommandHandler("weights", weights_command))
     application.add_handler(CommandHandler("setweights", setweights_command))
 
+    loop = asyncio.get_event_loop()
+    loop.create_task(dca_loop())
+    loop.create_task(grid_loop())
+    loop.create_task(scalping_loop())
+    loop.create_task(trend_loop())
+    loop.create_task(sentiment_loop())
+
     logger.info("Starting Telegram bot polling")
-    await asyncio.to_thread(application.run_polling)
-
-
-async def trading_tasks_runner():
-    tasks = [
-        asyncio.create_task(dca_loop()),
-        asyncio.create_task(grid_loop()),
-        asyncio.create_task(scalping_loop()),
-        asyncio.create_task(trend_loop()),
-        asyncio.create_task(sentiment_loop()),
-    ]
-    await asyncio.gather(*tasks)
-
-
-async def main():
-    await asyncio.gather(
-        trading_tasks_runner(),
-        telegram_bot(),
-    )
+    application.run_polling()
 
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        main()
     except Exception as e:
         logger.exception(f"Unhandled error: {e}")
