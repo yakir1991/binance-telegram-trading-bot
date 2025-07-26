@@ -17,3 +17,11 @@ Use `/weights` to view the current weights and `/setweights <dca> <grid> <scalpi
 ```
 /setweights 0.2 0.2 0.2 0.2 0.2
 ```
+
+## Running the Bot
+
+Install the required packages from `requirements.txt` and then start the bot:
+
+```
+python telegram_bot.py
+```
