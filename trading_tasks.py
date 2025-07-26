@@ -1,12 +1,10 @@
 import asyncio
 import logging
+import logger_config
 
 from strategies import dca, grid, scalping, trend_following, sentiment
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
-)
+# Configure module logger
 logger = logging.getLogger(__name__)
 
 # Bot configuration

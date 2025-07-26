@@ -2,6 +2,7 @@ import os
 import env_loader
 import asyncio
 import logging
+import logger_config
 
 from trading_tasks import (
     dca_loop,
@@ -14,9 +15,7 @@ from trading_tasks import (
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import binance_client
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
+# Configure module logger
 logger = logging.getLogger(__name__)
 
 
