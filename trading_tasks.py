@@ -30,6 +30,7 @@ CONFIG = {
         "trend": 0.2,
         "sentiment": 0.2,
     },
+    "risk_level": 1.0,
 }
 
 
@@ -39,7 +40,11 @@ async def dca_loop():
     """
     while True:
         symbol = CONFIG["symbols"][0]
-        amount = CONFIG["dca_amount"] * CONFIG["weights"]["dca"]
+        amount = (
+            CONFIG["dca_amount"]
+            * CONFIG["weights"]["dca"]
+            * CONFIG.get("risk_level", 1.0)
+        )
         interval = CONFIG["dca_interval_minutes"]
         # call the DCA strategy implementation
         await dca.execute(
@@ -58,7 +63,11 @@ async def grid_loop():
         lower = CONFIG["grid"]["lower"]
         upper = CONFIG["grid"]["upper"]
         levels = CONFIG["grid"]["levels"]
-        amount = CONFIG["dca_amount"] * CONFIG["weights"]["grid"]
+        amount = (
+            CONFIG["dca_amount"]
+            * CONFIG["weights"]["grid"]
+            * CONFIG.get("risk_level", 1.0)
+        )
         # call the grid strategy implementation
         await grid.execute(
             client=None,
@@ -77,7 +86,11 @@ async def scalping_loop():
     """
     while True:
         symbol = CONFIG["symbols"][0]
-        quantity = CONFIG["dca_amount"] * CONFIG["weights"]["scalping"]
+        quantity = (
+            CONFIG["dca_amount"]
+            * CONFIG["weights"]["scalping"]
+            * CONFIG.get("risk_level", 1.0)
+        )
         indicators = {"rsi_period": 14, "ema_fast": 7, "ema_slow": 25}
         # call the scalping strategy implementation
         await scalping.execute(
@@ -95,7 +108,11 @@ async def trend_loop():
     """
     while True:
         symbol = CONFIG["symbols"][0]
-        quantity = CONFIG["dca_amount"] * CONFIG["weights"]["trend"]
+        quantity = (
+            CONFIG["dca_amount"]
+            * CONFIG["weights"]["trend"]
+            * CONFIG.get("risk_level", 1.0)
+        )
 
         # call the trend following strategy implementation
         await trend_following.execute(
@@ -113,7 +130,11 @@ async def sentiment_loop():
     """
     while True:
         symbol = CONFIG["symbols"][0]
-        quantity = CONFIG["dca_amount"] * CONFIG["weights"]["sentiment"]
+        quantity = (
+            CONFIG["dca_amount"]
+            * CONFIG["weights"]["sentiment"]
+            * CONFIG.get("risk_level", 1.0)
+        )
         sentiment_score = (
             0.0  # placeholder sentiment score; integrate actual sentiment analysis here
         )

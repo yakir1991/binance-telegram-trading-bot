@@ -18,6 +18,20 @@ Use `/weights` to view the current weights and `/setweights <dca> <grid> <scalpi
 /setweights 0.2 0.2 0.2 0.2 0.2
 ```
 
+## Risk Level
+
+You can adjust how aggressively the bot trades by setting a risk level between `0.0` and `1.0`.
+The risk level acts as a multiplier on all trade sizes. Use `/risk` to see the
+current level and `/setrisk <level>` to change it. For example, to trade at half
+your usual size:
+
+```
+/setrisk 0.5
+```
+
+Setting the risk level to `0` effectively pauses trading, while `1` leaves trade
+sizes unchanged.
+
 ## Running the Bot
 
 Install the required packages from `requirements.txt` and then start the bot:
