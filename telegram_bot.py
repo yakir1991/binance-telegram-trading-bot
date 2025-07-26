@@ -79,7 +79,8 @@ async def weights_command(update, context):
     weights = CONFIG.get("weights", {})
     message = "Current strategy weights:\n"
     for name, value in weights.items():
-        message += f"{name}: {value:.2f}\n"
+        # Show four decimal places to avoid confusion when values are very small
+        message += f"{name}: {value:.4f}\n"
     await update.message.reply_text(message)
 
 
@@ -95,7 +96,7 @@ async def setweights_command(update, context):
             )
             CONFIG["weights"].update(weights)
             msg = "Updated weights:\n" + "\n".join(
-                f"{k}: {v:.2f}" for k, v in weights.items()
+                f"{k}: {v:.4f}" for k, v in weights.items()
             )
             await update.message.reply_text(msg)
         except Exception as e:

@@ -3,6 +3,7 @@ import logging
 import os
 import logger_config
 from data_training import calculate_recommended_weights
+from binance_client import get_binance_client
 
 from strategies import dca, grid, scalping, trend_following, sentiment
 
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 # Telegram integration
 TELEGRAM_BOT = None
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+BINANCE_CLIENT = None
 
 # Bot configuration
 CONFIG = {
@@ -27,6 +29,8 @@ CONFIG = {
     "scalping_interval_seconds": 60,
     "trend_interval_minutes": 5,
     "sentiment_interval_minutes": 10,
+    "sentiment_threshold": 0.1,
+    "sentiment_score": 0.5,
     "weights": {
         "dca": 0.2,
         "grid": 0.2,
@@ -49,7 +53,7 @@ async def dca_loop():
         interval = CONFIG["dca_interval_minutes"]
         # call the DCA strategy implementation
         await dca.execute(
-            client=None,
+            client=BINANCE_CLIENT,
             symbol=symbol,
             amount=amount,
             interval_minutes=interval,
@@ -72,7 +76,7 @@ async def grid_loop():
         amount = CONFIG["dca_amount"] * weight * CONFIG.get("risk_level", 1.0)
         # call the grid strategy implementation
         await grid.execute(
-            client=None,
+            client=BINANCE_CLIENT,
             symbol=symbol,
             lower_price=lower,
             upper_price=upper,
@@ -94,7 +98,7 @@ async def scalping_loop():
         indicators = {"rsi_period": 14, "ema_fast": 7, "ema_slow": 25}
         # call the scalping strategy implementation
         await scalping.execute(
-            client=None,
+            client=BINANCE_CLIENT,
             symbol=symbol,
             quantity=quantity,
             indicators=indicators,
@@ -117,7 +121,7 @@ async def trend_loop():
         # call the trend following strategy implementation
         indicators = {"lookback": 100}
         await trend_following.execute(
-            client=None,
+            client=BINANCE_CLIENT,
             symbol=symbol,
             quantity=quantity,
             indicators=indicators,
@@ -136,15 +140,15 @@ async def sentiment_loop():
         symbol = CONFIG["symbols"][0]
         weight = CONFIG["weights"]["sentiment"]
         quantity = CONFIG["dca_amount"] * weight * CONFIG.get("risk_level", 1.0)
-        sentiment_score = (
-            0.0  # placeholder sentiment score; integrate actual sentiment analysis here
-        )
+        sentiment_score = CONFIG.get("sentiment_score", 0.0)
+        threshold = CONFIG.get("sentiment_threshold", 0.0)
         # call the sentiment strategy implementation
         await sentiment.execute(
-            client=None,
+            client=BINANCE_CLIENT,
             symbol=symbol,
             sentiment_score=sentiment_score,
             quantity=quantity,
+            threshold=threshold,
             weight=weight,
             bot=TELEGRAM_BOT,
             chat_id=TELEGRAM_CHAT_ID,
@@ -169,6 +173,8 @@ async def main():
     """
     Entry point for running all strategy loops concurrently.
     """
+    global BINANCE_CLIENT
+    BINANCE_CLIENT = await get_binance_client()
     tasks = [
         asyncio.create_task(dca_loop()),
         asyncio.create_task(grid_loop()),
@@ -178,6 +184,8 @@ async def main():
         asyncio.create_task(weight_training_loop()),
     ]
     await asyncio.gather(*tasks)
+    if BINANCE_CLIENT:
+        await BINANCE_CLIENT.close_connection()
 
 
 if __name__ == "__main__":
