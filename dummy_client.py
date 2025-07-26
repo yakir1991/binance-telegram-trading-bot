@@ -91,8 +91,10 @@ class DummyClient:
     async def order_market_sell(self, symbol, quantity):
         price = self.prices.get(symbol, 0.0)
         base = symbol.replace("USDT", "")
-        if self.balances.get(base, {"free": 0.0})["free"] < quantity:
-            raise RuntimeError("Insufficient balance")
+        # In dummy mode allow selling even if balance is insufficient by
+        # permitting negative positions. This avoids errors when a strategy
+        # attempts to close a nonexistent holding.
+        self.balances.setdefault(base, {"free": 0.0, "locked": 0.0})
         self.balances[base]["free"] -= quantity
         proceeds = price * quantity
         fee = proceeds * self.fee_rate
