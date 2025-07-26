@@ -30,6 +30,7 @@ async def help_command(update, context):
         "/start – start chatting with the bot\n"
         "/status – check the current status of the strategies\n"
         "/help – display this command list"
+
     )
 
 async def telegram_bot():
