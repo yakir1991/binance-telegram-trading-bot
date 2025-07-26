@@ -42,7 +42,7 @@ async def fetch_historical_data(symbol: str, interval: str, lookback: str):
 async def calculate_recommended_weights(
     symbol: str,
     interval: str = AsyncClient.KLINE_INTERVAL_1HOUR,
-    lookback: str = "30 days ago UTC",
+    lookback: str = "365 days ago UTC",
 ) -> dict:
     """Return recommended strategy weights based on simple performance metrics."""
     df = await fetch_historical_data(symbol, interval, lookback)
@@ -66,7 +66,7 @@ async def calculate_recommended_weights(
 async def calculate_recommended_weights_with_progress(
     symbol: str,
     interval: str = AsyncClient.KLINE_INTERVAL_1HOUR,
-    lookback: str = "30 days ago UTC",
+    lookback: str = "365 days ago UTC",
     bot=None,
     chat_id=None,
 ) -> dict:

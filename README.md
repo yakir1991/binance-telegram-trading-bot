@@ -17,6 +17,8 @@ You can control how much capital each strategy uses by setting weights from Tele
 
 Use `/weights` to view the current weights and `/setweights <dca> <grid> <scalping> <trend> <sentiment>` to update them.
 You can also run `/setweights auto` to calculate weights from recent market data.
+The automatic calculation downloads roughly one year of hourly price history to
+determine momentum and volatility.
 For example:
 
 ```
