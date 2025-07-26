@@ -12,6 +12,7 @@ from trading_tasks import (
     sentiment_loop,
     CONFIG,
 )
+import trading_tasks
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import binance_client
 
@@ -20,6 +21,8 @@ logger = logging.getLogger(__name__)
 
 
 async def start_command(update, context):
+    trading_tasks.TELEGRAM_CHAT_ID = update.effective_chat.id
+    trading_tasks.TELEGRAM_BOT = context.bot
     await update.message.reply_text(
         "Hello! I'm your Binance trading bot.\n"
         "I run various trading strategies and update you on Telegram.\n"
@@ -174,6 +177,11 @@ def main() -> None:
         )
 
     application = ApplicationBuilder().token(telegram_token).build()
+    trading_tasks.TELEGRAM_BOT = application.bot
+    # Use chat ID from environment until /start command provides one
+    trading_tasks.TELEGRAM_CHAT_ID = trading_tasks.TELEGRAM_CHAT_ID or os.getenv(
+        "TELEGRAM_CHAT_ID"
+    )
     application.add_handler(CommandHandler("start", start_command))
     application.add_handler(CommandHandler("status", status_command))
     application.add_handler(CommandHandler("help", help_command))
